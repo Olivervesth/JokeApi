@@ -8,7 +8,7 @@ namespace JokeApi
     enum category
     {
         farjoke,
-        mågejoke,
+        mogejoke,
         dinmorjoke,
 
     }

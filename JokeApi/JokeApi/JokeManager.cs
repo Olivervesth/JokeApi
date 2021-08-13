@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace JokeApi
 {
     public class JokeManager
     {
         Jokes jk = new Jokes();
-        public string RndJoke()//Gets a random joke
-        {
-            //Array values = Enum.GetValues(typeof(category));//Category from enum list
-            //Random rnd = new Random();
-            //category cat = (category)values.GetValue(rnd.Next(values.Length));
+        Session_jokes session_Jokes = new Session_jokes();
+        //public Joke RndJoke()//Gets a random joke
+        //{
+        //    Array values = Enum.GetValues(typeof(category));//Category from enum list
+        //    Random rnd = new Random();
+        //    category cat = (category)values.GetValue(rnd.Next(values.Length));
 
-            //return JokeByCat(cat.ToString());
-            return "hello";
-        }
+        //    return JokeByCat(cat.ToString());
+        //}
 
         public Joke JokeByCat(string category,List<Joke> usedjokes)//Gets a joke by category
         {
@@ -26,7 +27,7 @@ namespace JokeApi
                 List < Joke > list = jokelist();
                 for (int i = 0; i < list.Count; i++)
                 {
-                    if (!usedjokes.Contains(list[i]) && list[i].type == category)
+                    if (!ContainsValue(usedjokes, list[i].joke) && list[i].type == category)
                     {
                         return list[i];
                     }
@@ -39,7 +40,7 @@ namespace JokeApi
                 //return "There is no such Category of jokes";
 
             }
-            return safetyjoke;
+            return NoMoreJks();
             //return "Hello";
         }
         public List<Joke> jokelist()//Convert items in array to joke and add them to list
@@ -55,7 +56,8 @@ namespace JokeApi
                 {
                     Joke newjk = new Joke()
                     {
-                        id = i + j + rnd.Next(1, 20),
+                        //id = i + j + rnd.Next(1, 20),
+                        id = 0,
                         type = jokearray[i, 0],
                         joke = jokearray[i, 1],
                     };
@@ -67,6 +69,32 @@ namespace JokeApi
             return list;
 
         }
+
+        public bool ContainsValue(List<Joke> list, string value)//check if list contains joke
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].joke == value)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public Joke NoMoreJks()
+        {
+           
+            return session_Jokes.EmptyJoke(); ;
+        }
+        public string CategoryList()
+        {
+           List<string> catlist = Enum.GetNames(typeof(category)).ToList();
+
+           return JsonSerializer.Serialize(catlist);
+        }
+
+       
     }
 }
 

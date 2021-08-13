@@ -24,7 +24,7 @@ namespace JokeApi.Controllers
 
             string usedjksjson = HttpContext.Session.GetString("usedjokes");
 
-            if (usedjksjson != "" || usedjksjson != null)
+            if (usedjksjson != "" && usedjksjson != null)
             {
                 usedjokelist = JsonSerializer.Deserialize<List<Joke>>(usedjksjson);
 
@@ -48,10 +48,17 @@ namespace JokeApi.Controllers
             return joke;
         }
         [HttpGet]
-        [Route("[action]")]
+        [Route("test")]
         public string test()
         {
+           
             return "test";
+        }
+        [HttpGet]
+        [Route("categorylist")]
+        public string ListOfCategorys()//Returns a list of categories
+        {
+            return jkm.CategoryList();
         }
     }
 }
