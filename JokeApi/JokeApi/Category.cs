@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 
 namespace JokeApi
 {
-    enum category
+    enum category//Types of jokes available
     {
         farjoke,
         mogejoke,
         dinmorjoke,
+        dadjoke,
 
     }
 }

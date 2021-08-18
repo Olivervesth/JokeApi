@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using SecuringWebApiUsingApiKey.Attributes;
 
 namespace JokeApi.Controllers
 {
+    //[ApiKey]
     [Route("[controller]")]
     [ApiController]
     public class JokeController : ControllerBase
@@ -17,48 +19,45 @@ namespace JokeApi.Controllers
 
         [HttpGet]
         [Route("{cat}")]
-        public string GetJoke(string cat)
+        public string GetJoke(string cat)//Returns a joke from chosen category
         {
-
-            List<Joke> usedjokelist = new List<Joke>();
-
+            Request.Headers.TryGetValue("Accept-Language", out var alpha);
+            Response.Cookies.Append("favoritecat", cat, jkm.CookieExpire());
+            string[] lang = alpha.ToString().Split(',');
+            Joke tempjoke = jkm.JokeByCat(cat, jkm.UsedJokesList(HttpContext.Session.GetString("usedjokes")), lang[0]);
             string usedjksjson = HttpContext.Session.GetString("usedjokes");
 
-            if (usedjksjson != "" && usedjksjson != null)
+            if (tempjoke.type != "no")
             {
-                usedjokelist = JsonSerializer.Deserialize<List<Joke>>(usedjksjson);
+                Request.HttpContext.Session.SetString("usedjokes", jkm.SaveJokeInSession(tempjoke, usedjksjson));
 
             }
-            Joke tempjoke = jkm.JokeByCat(cat, usedjokelist);
             string joke = tempjoke.joke;
-            List<Joke> jokelist = new List<Joke>();
-            jokelist.Add(tempjoke);
-            string jsonstring = "";
-            if (usedjksjson == "" || usedjksjson == null)
-            {
-                jsonstring = JsonSerializer.Serialize(jokelist);
-            }
-            else
-            {
-                //List<Joke> usedjokelist = JsonSerializer.Deserialize<List<Joke>>(usedjksjson);
-                jokelist.AddRange(usedjokelist);
-                jsonstring = JsonSerializer.Serialize(jokelist);
-            }
-            Request.HttpContext.Session.SetString("usedjokes", jsonstring);
             return joke;
         }
-        [HttpGet]
-        [Route("test")]
-        public string test()
-        {
-           
-            return "test";
-        }
+       
         [HttpGet]
         [Route("categorylist")]
         public string ListOfCategorys()//Returns a list of categories
         {
             return jkm.CategoryList();
         }
+
+        [HttpGet]
+        [Route("random")]
+        public string RandJoke()//Returns a random joke
+        {
+            List<Joke> usedjokes = jkm.UsedJokesList(HttpContext.Session.GetString("usedjokes"));
+            Joke joke = jkm.RndJoke(usedjokes);
+            return joke.joke;
+        }
+
+        [HttpGet]
+        [Route("fav")]
+        public string GetCookie()//Get the favorit category
+        {
+            return Request.Cookies["favoritecat"];
+        }
+
     }
 }

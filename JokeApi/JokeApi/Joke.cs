@@ -8,7 +8,6 @@ namespace JokeApi
     public class Joke
     {
         public string type { get; set; }
-        public int id { get; set; }
         public string joke { get; set; }
     }
 }
